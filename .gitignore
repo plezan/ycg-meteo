@@ -1,0 +1,5 @@
+node_modules/
+dev/
+build/
+howDidIDoThis.txt
+.DS_Store

@@ -1,0 +1,21 @@
+{
+    "env": {
+        "development": {
+            "presets": [
+                ["env",{
+                    "targets": "last 2 versions"
+                }]
+            ]
+        },
+        "production": {
+            "presets": [
+                ["minify", {
+                    "removeConsole":true
+                }],
+                ["env",{
+                    "targets": "> 0.25%, not dead"
+                }]
+            ]
+        }
+    }
+}

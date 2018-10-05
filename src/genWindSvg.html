@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+  <title>test wind dir</title>
+  
+</head>
+<body>
+   <style type="text/css">
+  
+  </style>
+  <div id="wind_widget"></div>
+  <script type='text/javascript'>
+    //MAIN
+    init('wind_widget');
+    var req = new XMLHttpRequest();
+        updateData();
+
+    //FUNCTIONS
+
+    function init(parent_selector){
+        parent = document.getElementById(parent_selector)
+        parent.innerHTML = null; //empty any old content
+
+        var content = document.createDocumentFragment();
+
+        ['aws','cws','wd','dash','nds'].forEach(function(id){
+          var temp_node = document.createElement('span');
+          temp_node.innerHTML = '00';
+          temp_node.className = 'ctxt';
+          temp_node.id = id;
+          content.appendChild(temp_node);
+        });
+
+        content.getElementById('dash').textContent = '-';
+        content.getElementById('nds').textContent = 'nds';
+
+        var windSvg = document.createElement('div');
+        windSvg.id = "windSvg";
+
+        var svg = document.createElement('svg');
+        svg.width = "105";
+        svg.height = "208";
+        svg.setAttribute('xmlns','http://www.w3.org/2000/svg');
+        svg.style = 'width:105px;height:280px;margin-left:82.5px;margin-right:82.5px;';
+
+        windSvg.appendChild(svg);
+        
+        content.appendChild(windSvg);
+
+        // style in head
+        var style = document.createElement('style');
+        style.innerHTML = "#windSvg,#wind_widget{height:320px;width:320px}#windSvg,.ctxt{text-align:center}#wind_widget{outline:dashed 1px;position:relative}.ctxt{font-family:orbitron;font-size:50px;position:absolute}#dash{left:140px;width:40px;top:5px}#nds{left:230px;top:50px;font-size:20px}#aws{right:185px;top:10px}#cws{top:10px;left:185px}#wd{bottom:0;left:80px;width:160px}#windSvg{box-sizing:border-box;padding:15px;transform:scale(.75)}"
+        document.getElementsByTagName('head')[0].appendChild(style);
+
+        // add widget content
+        parent.appendChild(content);
+    }
+
+
+    
+
+    function updateData(){
+
+      req.onreadystatechange = function(event) {
+        if (this.readyState !== XMLHttpRequest.DONE) return;
+          
+        if (this.status === 200) { //SUCESS
+          window.resu = this.responseXML;
+          var cw = resu.querySelector("wind0wind act kn").textContent;
+          var aw = resu.querySelector("wind0avgwind act kn").textContent;
+          var dw = resu.querySelector("wind0dir act deg").textContent;
+
+          document.getElementById('aws').textContent = aw;
+          document.getElementById('cws').textContent = cw;
+          document.getElementById('wd').textContent = dw+'°';
+
+          genWindSvg(aw,dw);
+          //alert(cw+'-'+aw+'kt '+dw+'°');
+
+        } else { //ERROR
+          console.error("Status de la réponse: %d (%s)", this.status, this.statusText);
+
+        } //ANYWAY
+
+        setTimeout(updateData,10000);
+        
+      };
+
+      req.open('GET', 'https://www.lezan.pro/meteo.xml', true);
+      req.send(null);
+    }
+    
+    function genWindSvg(ws,dir){
+
+      //parse Wind speed
+
+      var tws = ws;
+      var rws = [0,0,0];
+
+      rws[0] = Math.floor(tws/50);
+      tws -= rws[0]*50;
+
+
+      rws[1] = Math.floor(tws/10);
+      tws -= rws[1]*10;
+
+      rws[2] = Math.floor(tws/5);
+      tws -= rws[2]*5;
+
+      //console.log(rws);
+
+
+      // add info
+      var info = '';
+      var cursor = 250;
+
+      function hw(pos){return "<path stroke='#000' transform='rotate(-90 62.5,"+(pos-22.5)+")' id='svg_"+pos+"' d='m 40,"+(pos+15)+" l22.5,-75 l22.5,75 l-45,0 z' stroke-width='10' fill='#000'/>"};
+      function mw(pos){return "<line stroke='#000' stroke-width='10' x1='100' y1='"+(pos-5)+"' x2='10' y2='"+(pos+22.5)+"' id='svg_"+pos+"'/>"};
+      function lw(pos){return "<line stroke='#000' stroke-width='10' x1='100' y1='"+(pos-5)+"' x2='50' y2='"+(pos+10)+"' id='svg_"+pos+"'/>"};
+
+
+      for (var i = rws[0];i>0;i--) {
+        info += hw(cursor);
+        cursor -= 70;
+      }
+      for (var i = rws[1];i>0;i--) {
+        info += mw(cursor);
+        cursor -= 30;
+      }
+      for (var i = rws[2];i>0;i--) {
+        info += lw(cursor);
+        cursor -= 30;
+      }
+
+
+      // show result
+
+      document.getElementById('windSvg').innerHTML = 
+        "<svg width='105' height='280' style='transform: rotate("+dir+"deg); width: 105px;height: 280px;margin-left: 82.5px;margin-right: 82.5px;' xmlns='http://www.w3.org/2000/svg'>"+
+        "<g stroke='null'>"+
+        "<title stroke='null'>Layer 1</title>"+
+        "<line stroke='#000' stroke-width='10' x1='100' y1='0' x2='100' y2='250' id='svg_1'/>"+info+"</g>"+"</svg>"
+    }
+  </script>
+</body>
+</html>
