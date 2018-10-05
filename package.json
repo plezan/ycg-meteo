@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "babel src -d dev",
+    "demo": "rm -rf demo/ && BABEL_ENV=production babel src -d demo && node demo.js",
     "build": "BABEL_ENV=production babel src -d build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "babel-preset-minify": "^0.5.0"
+    "babel-preset-minify": "^0.5.0",
+    "html-entities": "^1.2.1"
   }
 }

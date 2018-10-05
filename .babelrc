@@ -15,7 +15,8 @@
                 ["env",{
                     "targets": "> 0.25%, not dead"
                 }]
-            ]
+            ],
+            "comments":false
         }
     }
 }
