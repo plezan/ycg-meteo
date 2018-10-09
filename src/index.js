@@ -50,6 +50,7 @@ function updateData() {
             var aws = resu.querySelector('wind0avgwind act kn').textContent;
             var wd = resu.querySelector('wind0dir act deg').textContent;
 
+            //aws = 16;
             //wd = Math.random()*360;//for debug purpose only
 
             window.wd_old = (window.old && window.old.wd)? (window.old.wd)*1 : wd*1;
@@ -134,10 +135,10 @@ function genWindSvg(ws, dir) {
 
     // show result
     document.getElementById('windSvg').innerHTML = 
-        "<svg width='105' height='280' transform='rotate("+(dir-180)+")' style='width: 105px;height: 280px;margin-left: 82.5px;margin-right: 82.5px;' xmlns='http://www.w3.org/2000/svg'>"+
-        "<g stroke='null'>"+
+        "<svg width='320' height='320' style='width: 320px;height:320px;padding-left:50px;padding-top:15px' xmlns='http://www.w3.org/2000/svg'>"+
+        "<g stroke='null' text-anchor='middle' transform='scale(0.9) rotate("+(dir-180)+" 100 150)'>"+
         "<title stroke='null'>Layer 1</title>"+
-        "<line stroke='#000' stroke-width='10' x1='100' y1='0' x2='100' y2='250' id='svg_1'/>"+info+"</g>"+"</svg>";
+        "<line stroke='#000' stroke-width='10' stroke-linecap='round' x1='100' y1='0' x2='100' y2='245' id='svg_1'/>"+info+"</g>"+"</svg>";
 }
 init('wind_widget');
 var req = new XMLHttpRequest();
