@@ -39,7 +39,9 @@ function init(e) {
 }
 
 function updateData() {
+    console.log('updateData');
     req.onreadystatechange = function (e) {
+
         if (this.readyState !== XMLHttpRequest.DONE) return;
         
         if (200 === this.status) { //SUCESS
@@ -47,12 +49,35 @@ function updateData() {
             var cws = resu.querySelector('wind0wind act kn').textContent;
             var aws = resu.querySelector('wind0avgwind act kn').textContent;
             var wd = resu.querySelector('wind0dir act deg').textContent;
-            
+
+            //wd = Math.random()*360;//for debug purpose only
+
+            window.wd_old = (window.old && window.old.wd)? (window.old.wd)*1 : wd*1;
+             
             document.getElementById('aws').textContent = aws;
             document.getElementById('cws').textContent = cws;
             document.getElementById('wd').textContent = wd + '\xB0';
             
-            genWindSvg(aws,wd);
+            var start = null;
+            const anim_length = 3000;
+            const swr = ((wd-wd_old+180)%360-180); // simplified wind rotation
+
+            var step = (timestamp)=>{
+                if(start == null) start = timestamp;// init
+                const t = (timestamp-start)/anim_length;
+                const eased_t = (t*t)*(3-2*t);//fiest number = parameter
+                let wd_tmp = wd_old*1+swr*(eased_t);
+                genWindSvg(aws,wd_tmp);
+                if(timestamp < start+anim_length ){
+                    // loop
+                    requestAnimationFrame(step);
+                }else{ // exit loop
+                    if(!window.old) window.old = {}
+                    window.old.wd = wd;
+                }
+            }
+            requestAnimationFrame(step);
+            //genWindSvg(aws,wd);
         
         } else { //ERROR
             console.error(
